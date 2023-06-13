@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace WebApi7.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class StajController : ControllerBase
     {
         private readonly string _connectionString;
@@ -18,17 +18,26 @@ namespace WebApi7.Controllers
         }
 
         [HttpGet]
-        public string Get()
+        
+        public string List()
         {
             using var con = new SqlConnection(_connectionString);
             using var da = new SqlDataAdapter("Select * FROM staj1", con);
             var dt = new DataTable();
             da.Fill(dt);
-            return dt.Rows.Count > 0 ? JsonConvert.SerializeObject(dt) : "Veritabanında hicbir kayit bulunamadi";
+            if (dt.Rows.Count > 0)
+            {
+                return JsonConvert.SerializeObject(dt);
+            }
+            else
+            {
+                return "Veritabanında hiçbir kayıt bulunamadı";
+            }
+
         }
 
         [HttpGet("{id}")]
-        [Route("api/staj/{id}")]
+      
         public string Get(int id)
         {
             using var con = new SqlConnection(_connectionString);
@@ -54,8 +63,8 @@ namespace WebApi7.Controllers
         }
 
         [HttpPost]
-        [Route("api/staj")]
-        public string Post([FromBody] Person person)
+        
+        public string Save([FromBody] Person person)
         {
             using var con = new SqlConnection(_connectionString);
             using var cmd = new SqlCommand("Insert into staj1(Name, LastName) VALUES(@Name, @LastName)", con);
